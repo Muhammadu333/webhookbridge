@@ -9,6 +9,7 @@ import { env } from "./env.js";
 import { webhooksRouter } from "./routes/webhooks.js";
 import { eventsRouter } from "./routes/events.js";
 import { runWorkerOnce } from "./worker.js";
+import { runMigrations } from "./migrate.js";
 
 if (!env.databaseUrl) throw new Error("DATABASE_URL is required");
 if (!env.webhookSecret || env.webhookSecret.length < 24)
@@ -38,8 +39,21 @@ setInterval(() => {
   runWorkerOnce().catch(() => {});
 }, 1000);
 
-app.listen(env.port, () => {
-  // eslint-disable-next-line no-console
-  console.log(`webhookbridge listening on :${env.port}`);
-});
+async function main() {
+  try {
+    await runMigrations();
+  } catch {
+    // If the DB is temporarily unavailable, Render will restart; keep logs minimal for demos.
+  }
 
+  app.listen(env.port, () => {
+    // eslint-disable-next-line no-console
+    console.log(`webhookbridge listening on :${env.port}`);
+  });
+}
+
+main().catch((err) => {
+  // eslint-disable-next-line no-console
+  console.error(err);
+  process.exit(1);
+});

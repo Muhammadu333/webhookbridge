@@ -1,6 +1,11 @@
 create extension if not exists "uuid-ossp";
 
-create type event_status as enum ('pending', 'processing', 'processed', 'dead');
+do $$
+begin
+  create type event_status as enum ('pending', 'processing', 'processed', 'dead');
+exception
+  when duplicate_object then null;
+end $$;
 
 create table if not exists events (
   id uuid primary key default uuid_generate_v4(),
@@ -17,4 +22,3 @@ create table if not exists events (
 
 create unique index if not exists events_provider_idempotency_key_uq
   on events (provider, idempotency_key);
-
