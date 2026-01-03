@@ -42,8 +42,9 @@ setInterval(() => {
 async function main() {
   try {
     await runMigrations();
-  } catch {
-    // If the DB is temporarily unavailable, Render will restart; keep logs minimal for demos.
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error("migrations_failed", err);
   }
 
   app.listen(env.port, () => {

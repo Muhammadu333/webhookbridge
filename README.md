@@ -70,3 +70,6 @@ View events: `GET http://localhost:4010/events`
 - Separate “public ingestion” from “internal processing”.
 - Tune rate limits and max payload size to your expected provider behavior.
 
+## Render note (DB connectivity)
+
+If you use Render Postgres, prefer the **Internal Database URL** for `DATABASE_URL`. If you use an External URL, SSL is typically required.
